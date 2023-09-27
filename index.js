@@ -183,6 +183,8 @@ function restoreColorsFromLocalStorage() {
 // видаляються із localStorage броузера і припиняється їхнє відображення у блоці
 // «1» без перезавантаження веб-сторінки.
 
+window.addEventListener('load', displayImagesFromLocalStorage);
+
 function getSelectedText() {
     var text = "";
     if (typeof window.getSelection != "undefined") {
@@ -196,9 +198,45 @@ function getSelectedText() {
 function checkTextHighliting() {
     let selectedText = getSelectedText();
     if (selectedText.includes('Пийте квас')) {
-        const newForm = '';
-        document.getElementById('div5').innerHTML += newForm;
+        const container = document.getElementById('link-container');
+        if (!container) {
+            createLinkContainer();
+        }
     }
+}
+
+function createLinkContainer() {
+    const linkContainer = document.createElement('div');
+    linkContainer.id = 'link-container';
+
+    const imageForm = document.createElement('form');
+    imageForm.id = 'imageForm';
+
+    const label = document.createElement('label');
+    label.setAttribute('for', 'imageURL');
+    label.textContent = 'Введіть посилання на зображення';
+
+    const input = document.createElement('input');
+    input.setAttribute('type', 'url');
+    input.id = 'imageURL';
+    input.setAttribute('placeholder', 'https://link...');
+
+    const addButton = document.createElement('button');
+    addButton.setAttribute('type', 'submit');
+    addButton.textContent = 'Додати';
+
+    imageForm.appendChild(label);
+    imageForm.appendChild(input);
+    imageForm.appendChild(addButton);
+
+    const generateButton = document.createElement('button');
+    generateButton.textContent = 'Згенерувати';
+    generateButton.addEventListener('click', addRandomImage);
+
+    linkContainer.appendChild(imageForm);
+    linkContainer.appendChild(generateButton);
+
+    document.getElementById('div5').appendChild(linkContainer);
 }
 
 (() => {
@@ -302,6 +340,9 @@ function displayImagesFromLocalStorage() {
 }
 
 function createDeleteButton() {
+    if (document.getElementById('deleteImagesButton')) {
+        return;
+    }
     let button = document.createElement('button');
     button.addEventListener('click', deleteImagesFromLocalStorage);
     button.id = 'deleteImagesButton';
@@ -311,7 +352,7 @@ function createDeleteButton() {
 }
 
 function deleteImagesFromLocalStorage() {
-    localStorage.removeItem('imageUrls');
+    localStorage.removeItem('imageURLs');
 
     const storageItems = document.querySelectorAll('.local-storage-item');
     const images = document.querySelectorAll('.image');
